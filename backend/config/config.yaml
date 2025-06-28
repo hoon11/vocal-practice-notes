@@ -4,4 +4,5 @@ watcher:
 
 transcriber:
   enabled: true
-  model_size: small  # Options: tiny, base, small, medium, large
+  model_size: small    # Options: tiny, base, small, medium, large
+  transcripts_dir: tests/transcripts  # Directory for output JSON files
