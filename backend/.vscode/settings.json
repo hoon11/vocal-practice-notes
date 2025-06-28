@@ -1,0 +1,17 @@
+{
+    // Python 기본 포매터 설정 (black, autopep8, yapf 중 선택)
+    "python.formatting.provider": "black",
+
+    // Shift+Alt+F 등 VSCode 포맷 명령어로 포매팅
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python"
+    },
+
+    // 저장 시 자동 포맷 (선택)
+    "editor.formatOnSave": true,
+
+    // black 포매터 세부 옵션 (선택)
+    "python.formatting.blackArgs": [
+        "--line-length=88"
+    ]
+}
