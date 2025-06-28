@@ -1,5 +1,6 @@
-# main.py
-from whisper_worker.watcher import start_watch
+from modules import watcher
 
+# Main entry point for backend
+# バックエンドのエントリポイント
 if __name__ == "__main__":
-    start_watch()
+    watcher.start()

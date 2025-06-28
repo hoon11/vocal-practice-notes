@@ -1,40 +1,7 @@
-# Configuration for the file watcher
-# ファイル監視設定
 watcher:
-  # Folder to monitor for new audio files
-  # 新しいオーディオファイルを監視するフォルダ
-  input_dir: "audio"
+  watch_folder: tests/resources
+  file_extension: .wav
 
-  # Folder where transcription outputs will be saved
-  # 文字起こしの出力を保存するフォルダ
-  output_dir: "transcripts"
-
-  # List of allowed audio file extensions to watch
-  # 対象とするオーディオファイルの拡張子リスト
-  file_extensions: [".wav"]
-
-  # Whether to watch subdirectories inside the input_dir
-  # サブディレクトリも監視対象にするか
-  recursive: false
-
-# Configuration for Whisper transcription
-# Whisper 文字起こしの設定
-whisper:
-  # Whether to enable transcription
-  # 文字起こしを有効にするか
+transcriber:
   enabled: true
-
-  # Whisper model type to use
-  # 使用するWhisperモデルのタイプを指定
-  # Options:
-  # - tiny:      Fastest, lowest accuracy, smallest size (~39MB)
-  #              非常に高速、精度は低め、モデルサイズ最小（約39MB）
-  # - base:      Fast, slightly better accuracy (~74MB)
-  #              高速、精度少し向上（約74MB）
-  # - small:     Balanced, good accuracy (~244MB)
-  #              バランス型、良好な精度（約244MB）
-  # - medium:    Slower, higher accuracy (~769MB)
-  #              やや遅いが高精度（約769MB）
-  # - large:     Slowest, best accuracy, large size (~1550MB)
-  #              最も高精度、非常に大きいモデルサイズ（約1550MB）
-  model_size: "small"
+  model_size: small  # Options: tiny, base, small, medium, large
