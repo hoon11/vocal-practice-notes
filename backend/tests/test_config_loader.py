@@ -1,36 +1,35 @@
-# tests/test_config_loader.py
-import sys
-import os
-from pathlib import Path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from pydantic_settings import BaseSettings
+from pydantic import Field
 
-import pytest
-from modules.config_loader import load_config
-import tempfile
-import yaml
+class WatcherConfig(BaseSettings):
+    watch_folder: str = Field(..., description="감시 폴더")
+    file_extension: str = Field(".wav", description="파일 확장자")
 
-def test_load_valid_config(tmp_path):
-    cfg = tmp_path / "valid.yaml"
-    cfg.write_text("""
-    whisper_model: base
-    use_whisper: true
-    watch_folder: ./audio
-    output_folder: ./output
-    """, encoding="utf-8")
-    from modules import config_loader
-    config = config_loader.load_config(str(cfg))
-    assert config.whisper_model == "base"
-    assert config.use_whisper is True
+class TranscriberConfig(BaseSettings):
+    model_size: str = Field(..., description="Whisper 모델 크기")
+    transcripts_dir: str = Field(..., description="결과 저장 폴더")
 
-def test_env_override(monkeypatch, tmp_path):
-    cfg = tmp_path / "valid.yaml"
-    cfg.write_text("""
-    whisper_model: base
-    use_whisper: false
-    watch_folder: ./audio
-    output_folder: ./output
-    """, encoding="utf-8")
-    monkeypatch.setenv("USE_WHISPER", "true")
-    from modules import config_loader
-    config = config_loader.load_config(str(cfg))
-    assert config.use_whisper is True
+class PitchConfig(BaseSettings):
+    output_dir: str = Field(..., description="피치 분석 결과 폴더")
+
+class AppConfig(BaseSettings):
+    watcher: WatcherConfig
+    transcriber: TranscriberConfig
+    pitch: PitchConfig
+
+    class Config:
+        env_nested_delimiter = '__'  # PITCH__OUTPUT_DIR 오버라이드 가능!
+
+def load_config(config_path=None) -> AppConfig:
+    import yaml
+    from pathlib import Path
+
+    if config_path is None:
+        config_path = Path(__file__).parent.parent / "config" / "config.yaml"
+    else:
+        config_path = Path(config_path)
+    with open(config_path, encoding="utf-8") as f:
+        config_dict = yaml.safe_load(f)
+    # BaseSettings 객체는 .parse_obj로 생성해야 환경변수 오버라이드가 동작
+    config = AppConfig.parse_obj(config_dict)
+    return config

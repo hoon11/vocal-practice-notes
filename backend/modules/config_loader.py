@@ -1,3 +1,10 @@
+"""
+modules/config_loader.py
+
+YAML config loader with nested models and validation (pydantic).
+YAML設定ファイルのネストモデルとバリデーション対応ローダー。
+"""
+
 import os
 import yaml
 import logging
@@ -6,48 +13,38 @@ from pydantic import BaseModel, Field, ValidationError
 
 logger = logging.getLogger(__name__)
 
-class AppConfig(BaseModel):
-    whisper_model: str = Field(..., description="Whisper model name / Whisperモデル名")
-    use_whisper: bool = Field(True, description="Enable Whisper transcription / Whisper変換有効化")
-    watch_folder: str = Field(..., description="Folder to watch for .wav files / 監視対象フォルダ")
-    output_folder: str = Field(..., description="Folder to save output files / 出力ファイル保存先")
-    log_level: str = Field("INFO", description="Logging level / ログレベル")
+class WatcherConfig(BaseModel):
+    watch_folder: str = Field(..., description="감시 폴더 / 監視フォルダ")
+    file_extension: str = Field(".wav", description="파일 확장자 / ファイル拡張子")
 
-    class Config:
-        extra = "forbid"
+class TranscriberConfig(BaseModel):
+    model_size: str = Field(..., description="Whisper 모델 크기 / Whisperモデルサイズ")
+    transcripts_dir: str = Field(..., description="결과 저장 폴더 / 出力フォルダ")
+
+class PitchConfig(BaseModel):
+    output_dir: str = Field(..., description="피치 분석 결과 폴더 / ピッチ分析結果出力")
+
+class AppConfig(BaseModel):
+    watcher: WatcherConfig
+    transcriber: TranscriberConfig
+    pitch: PitchConfig
 
 def load_config(config_path=None) -> AppConfig:
     """
-    Load configuration from YAML, validate with AppConfig, override by environment variables.
-    YAMLから設定を読み込み、AppConfigでバリデーションし、環境変数で上書き。
+    Load configuration from YAML and validate.
+    YAMLから設定を読み込みバリデーションする
     """
     if config_path is None:
         config_path = Path(__file__).parent.parent / "config" / "config.yaml"
     else:
         config_path = Path(config_path)
-    
+
     try:
         with open(config_path, encoding="utf-8") as f:
             config_dict = yaml.safe_load(f)
-    except FileNotFoundError:
-        logger.error(f"Config file not found at: {config_path}")
+    except Exception as e:
+        logger.error(f"Config load/parsing error: {e}")
         raise
-    except yaml.YAMLError as e:
-        logger.error(f"YAML parsing failed: {e}")
-        raise
-
-    # pydantic v2 호환: model_fields와 annotation 사용
-    for field in AppConfig.model_fields:
-        env_key = field.upper()
-        if env_key in os.environ:
-            val = os.environ[env_key]
-            field_info = AppConfig.model_fields[field]
-            field_type = field_info.annotation
-            if field_type is bool:
-                val = val.lower() in ("1", "true", "yes")
-            elif field_type is int:
-                val = int(val)
-            config_dict[field] = val
 
     try:
         config = AppConfig(**config_dict)
@@ -56,7 +53,3 @@ def load_config(config_path=None) -> AppConfig:
         raise
 
     return config
-
-if __name__ == "__main__":
-    config = load_config()
-    print(config)
