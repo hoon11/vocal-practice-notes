@@ -3,7 +3,7 @@ import signal
 import time
 import threading
 
-from backend.modules import watcher
+from modules import watcher
 
 def test_watcher_graceful_shutdown():
     # Start watcher in a separate thread

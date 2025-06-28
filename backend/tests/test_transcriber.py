@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 from modules import transcriber
-from config_loader import load_config
+from modules.config_loader import load_config
 import json
 
 class TestTranscriber(unittest.TestCase):

@@ -4,7 +4,9 @@ import threading
 import signal
 from pathlib import Path
 
-from backend.modules.config_loader import config  # Adjusted path for project structure
+from modules.config_loader import load_config
+
+config = load_config()
 
 # English: Event to signal the thread to stop
 # 日本語: スレッドの停止を通知するためのイベント
