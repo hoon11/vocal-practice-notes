@@ -1,103 +1,61 @@
+# tests/test_watcher.py
+import sys
+import os
+from pathlib import Path
+import warnings
+
+# Suppress warning about unsupported FP16 on CPU from Whisper
+# This does not affect the correctness of the test because FP32 is used as fallback.
+warnings.filterwarnings(
+    "ignore", message="FP16 is not supported on CPU; using FP32 instead"
+)
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import pytest
 import threading
 import time
-import os
-import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import modules.watcher as watcher
+import logging
 
-@pytest.fixture
-def temp_watch_dir(tmp_path):
-    """Create a temporary directory for watcher testing."""
-    return tmp_path
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def test_watcher_detects_new_file(monkeypatch, temp_watch_dir):
-    """
-    Test that start_watching detects new files and prints the correct message.
-    """
-    # Patch config to use temp dir and .wav extension
-    fake_config = {
-        "watcher": {
-            "watch_folder": str(temp_watch_dir),
-            "file_extension": "wav"
-        }
-    }
-    monkeypatch.setattr(watcher, "config", fake_config)
 
-    # Track print output
-    output = []
-    monkeypatch.setattr("builtins.print", lambda x: output.append(x))
+def test_watcher_ignores_existing_files(tmp_path, caplog):
+    test_file = tmp_path / "already.wav"
+    test_file.write_bytes(b"dummy")
+    watcher.config["watcher"]["watch_folder"] = str(tmp_path)
+    watcher.config["watcher"]["file_extension"] = ".wav"
 
-    # Patch stop_event to a new Event instance for each test
-    event = threading.Event()
-    monkeypatch.setattr(watcher, "stop_event", event)
+    watcher.stop_event = threading.Event()
+    watcher_thread = threading.Thread(target=watcher.start_watching)
+    watcher_thread.start()
 
-    # Run watcher in a thread (as in start())
-    thread = threading.Thread(target=watcher.start_watching)
-    thread.start()
-    time.sleep(0.5)  # Let watcher start
+    time.sleep(2)
+    watcher.stop_event.set()
+    watcher_thread.join()
 
-    # Add new wav file
-    test_wav = temp_watch_dir / "test123.wav"
-    test_wav.write_bytes(b"RIFF....WAVEfmt ")
-    time.sleep(1.5)  # Give time for watcher to detect
+    logs = caplog.text
+    assert "New file detected" not in logs
 
-    # Stop watcher
-    event.set()
-    thread.join(timeout=2)
 
-    # Check that watcher printed detection message
-    detected = any("New file detected" in msg for msg in output)
-    assert detected, "Watcher must print detection message for new file"
+def test_watcher_detects_new_file(tmp_path, caplog):
+    caplog.set_level(logging.INFO)
+    watcher.config["watcher"]["watch_folder"] = str(tmp_path)
+    watcher.config["watcher"]["file_extension"] = ".wav"
 
-def test_watcher_graceful_stop(monkeypatch, temp_watch_dir):
-    """
-    Test that watcher stops gracefully when stop_event is set.
-    """
-    fake_config = {
-        "watcher": {
-            "watch_folder": str(temp_watch_dir),
-            "file_extension": "wav"
-        }
-    }
-    monkeypatch.setattr(watcher, "config", fake_config)
-    event = threading.Event()
-    monkeypatch.setattr(watcher, "stop_event", event)
+    watcher.stop_event = threading.Event()
+    watcher_thread = threading.Thread(target=watcher.start_watching)
+    watcher_thread.start()
 
-    thread = threading.Thread(target=watcher.start_watching)
-    thread.start()
-    time.sleep(0.5)
-    event.set()  # Request graceful stop
-    thread.join(timeout=2)
-    assert not thread.is_alive(), "Watcher thread must exit gracefully"
+    new_file = tmp_path / "new.wav"
+    test_audio = Path(__file__).parent / "resources" / "test_audio.wav"
+    new_file.write_bytes(test_audio.read_bytes())
 
-def test_watcher_ignores_existing_files(monkeypatch, temp_watch_dir):
-    """
-    Test that watcher does not re-detect files already processed.
-    """
-    fake_config = {
-        "watcher": {
-            "watch_folder": str(temp_watch_dir),
-            "file_extension": "wav"
-        }
-    }
-    monkeypatch.setattr(watcher, "config", fake_config)
-    event = threading.Event()
-    monkeypatch.setattr(watcher, "stop_event", event)
-    output = []
-    monkeypatch.setattr("builtins.print", lambda x: output.append(x))
+    time.sleep(3)
+    watcher.stop_event.set()
+    watcher_thread.join()
 
-    # Pre-create a file before watcher starts
-    preexisting = temp_watch_dir / "existing.wav"
-    preexisting.write_bytes(b"RIFF....WAVEfmt ")
-
-    thread = threading.Thread(target=watcher.start_watching)
-    thread.start()
-    time.sleep(1)
-    event.set()
-    thread.join(timeout=2)
-
-    # It should NOT print detection for preexisting file
-    detected = any("New file detected" in msg for msg in output)
-    assert not detected, "Watcher should not detect already existing files"
+    logs = caplog.text
+    assert "New file detected" in logs
