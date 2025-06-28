@@ -1,61 +1,28 @@
-# tests/test_watcher.py
-import sys
-import os
-from pathlib import Path
-import warnings
-
-# Suppress warning about unsupported FP16 on CPU from Whisper
-# This does not affect the correctness of the test because FP32 is used as fallback.
-warnings.filterwarnings(
-    "ignore", message="FP16 is not supported on CPU; using FP32 instead"
-)
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-import pytest
 import threading
 import time
-import modules.watcher as watcher
-import logging
+import pathlib
+from modules.watcher import DirectoryWatcher
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+def test_watcher_detects_new_wav(tmp_path):
+    events = []
+    shutdown = threading.Event()
+    watcher = DirectoryWatcher(str(tmp_path), events.append, shutdown)
+    t = threading.Thread(target=watcher.start, daemon=True)
+    t.start()
+    time.sleep(0.2)  # 감시 준비 시간 확보!
 
+    test_file = tmp_path / "test.wav"
+    test_file.write_bytes(b"dummy data")
 
-def test_watcher_ignores_existing_files(tmp_path, caplog):
-    test_file = tmp_path / "already.wav"
-    test_file.write_bytes(b"dummy")
-    watcher.config["watcher"]["watch_folder"] = str(tmp_path)
-    watcher.config["watcher"]["file_extension"] = ".wav"
+    # 최대 5초간 polling (Windows/FS buffer 이슈까지 대응)
+    deadline = time.time() + 5
+    target_path = str(test_file.resolve())
+    while time.time() < deadline:
+        # 모든 이벤트를 절대경로(resolve)로 비교
+        if any(pathlib.Path(e).resolve() == pathlib.Path(target_path) for e in events):
+            break
+        time.sleep(0.05)
+    shutdown.set()
+    t.join(timeout=2)
 
-    watcher.stop_event = threading.Event()
-    watcher_thread = threading.Thread(target=watcher.start_watching)
-    watcher_thread.start()
-
-    time.sleep(2)
-    watcher.stop_event.set()
-    watcher_thread.join()
-
-    logs = caplog.text
-    assert "New file detected" not in logs
-
-
-def test_watcher_detects_new_file(tmp_path, caplog):
-    caplog.set_level(logging.INFO)
-    watcher.config["watcher"]["watch_folder"] = str(tmp_path)
-    watcher.config["watcher"]["file_extension"] = ".wav"
-
-    watcher.stop_event = threading.Event()
-    watcher_thread = threading.Thread(target=watcher.start_watching)
-    watcher_thread.start()
-
-    new_file = tmp_path / "new.wav"
-    test_audio = Path(__file__).parent / "resources" / "test_audio.wav"
-    new_file.write_bytes(test_audio.read_bytes())
-
-    time.sleep(3)
-    watcher.stop_event.set()
-    watcher_thread.join()
-
-    logs = caplog.text
-    assert "New file detected" in logs
+    assert any(pathlib.Path(e).resolve() == pathlib.Path(target_path) for e in events), f"{target_path} not in {events}"

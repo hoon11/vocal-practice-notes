@@ -1,8 +1,12 @@
+# config/config.yaml
+
 watcher:
-  watch_folder: tests/resources
-  file_extension: .wav
+  watch_folder: "backend/audio"
+  file_extension: ".wav"
 
 transcriber:
-  enabled: true
-  model_size: small    # Options: tiny, base, small, medium, large
-  transcripts_dir: tests/transcripts  # Directory for output JSON files
+  model_size: "base"
+  transcripts_dir: "backend/transcripts"
+
+pitch:
+  output_dir: "backend/output/pitch"

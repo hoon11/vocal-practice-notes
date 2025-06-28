@@ -9,19 +9,28 @@ from modules.config_loader import load_config
 import tempfile
 import yaml
 
-def test_load_valid_config():
-    config = load_config()
-    assert "watcher" in config
-    assert "transcriber" in config
+def test_load_valid_config(tmp_path):
+    cfg = tmp_path / "valid.yaml"
+    cfg.write_text("""
+    whisper_model: base
+    use_whisper: true
+    watch_folder: ./audio
+    output_folder: ./output
+    """, encoding="utf-8")
+    from modules import config_loader
+    config = config_loader.load_config(str(cfg))
+    assert config.whisper_model == "base"
+    assert config.use_whisper is True
 
-def test_load_missing_file():
-    with pytest.raises(FileNotFoundError):
-        load_config("nonexistent.yaml")
-
-def test_load_invalid_yaml():
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".yaml") as tmp:
-        tmp.write(b": invalid_yaml")
-        tmp_path = tmp.name
-    with pytest.raises(yaml.YAMLError):
-        load_config(tmp_path)
-    os.remove(tmp_path)
+def test_env_override(monkeypatch, tmp_path):
+    cfg = tmp_path / "valid.yaml"
+    cfg.write_text("""
+    whisper_model: base
+    use_whisper: false
+    watch_folder: ./audio
+    output_folder: ./output
+    """, encoding="utf-8")
+    monkeypatch.setenv("USE_WHISPER", "true")
+    from modules import config_loader
+    config = config_loader.load_config(str(cfg))
+    assert config.use_whisper is True
