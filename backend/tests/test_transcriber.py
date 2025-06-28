@@ -1,34 +1,21 @@
 # tests/test_transcriber.py
-import sys
-import os
-import shutil
-import json
 import pytest
-import warnings
 from pathlib import Path
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from modules.transcriber import transcribe, get_whisper_model
 from modules.config_loader import load_config
-
-warnings.filterwarnings(
-    "ignore", message="FP16 is not supported on CPU; using FP32 instead"
-)
+import json
+import shutil
 
 @pytest.fixture
 def test_config(tmp_path):
     config = load_config()
-    # 임시 output 경로로 덮어쓰기
     config.transcriber.transcripts_dir = str(tmp_path)
     return config
 
 def test_transcribe_creates_json(test_config):
     test_path = Path(__file__).parent / "resources" / "test.wav"
-    assert test_path.exists(), "테스트 오디오 파일이 존재해야 함"
-
     output_path = transcribe(test_path, test_config)
-    assert output_path.exists(), f"Transcription JSON file should be created: {output_path}"
+    assert output_path.exists()
     with open(output_path, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert "text" in data
@@ -51,7 +38,6 @@ def test_transcribe_handles_nonexistent_file(test_config):
 
 def test_transcribe_invalid_config(tmp_path):
     test_path = Path(__file__).parent / "resources" / "test.wav"
-    # 중첩 config가 빠짐 → 검증 오류
     class DummyConfig:
         pass
     bad_config = DummyConfig()

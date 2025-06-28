@@ -1,30 +1,22 @@
 # tests/test_pitch_extractor.py
-import sys
-import os
-import shutil
-from pathlib import Path
 import pytest
-import json
-import warnings
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-warnings.filterwarnings("ignore", message="FP16 is not supported on CPU; using FP32 instead")
-
 from modules.pitch_extractor import extract_pitch
 from modules.config_loader import load_config
+from pathlib import Path
+import json
 
 @pytest.fixture
 def test_config(tmp_path):
     config = load_config()
-    # AppConfig 객체 기반이면:
-    if hasattr(config.pitch, "output_dir"):
-        config.pitch.output_dir = str(tmp_path)
-    else:
-        config["pitch"]["output_dir"] = str(tmp_path)
+    config.pitch.output_dir = str(tmp_path)
     return config
 
 def test_extract_pitch_output(test_config):
+    """
+    피치 분석 결과 파일 생성 체크
+    Pitch extraction output file creation check
+    ピッチ抽出結果ファイルの生成チェック
+    """
     test_audio = Path(__file__).parent / "resources" / "test.wav"
     result = extract_pitch(test_audio, test_config)
     output_json = Path(test_config.pitch.output_dir) / "test_pitch.json"
@@ -37,6 +29,11 @@ def test_extract_pitch_output(test_config):
     assert "unvoiced_ratio" in data
 
 def test_extract_pitch_missing_file(test_config):
+    """
+    존재하지 않는 파일 입력시 에러 체크
+    Check error on nonexistent file input
+    存在しないファイル入力時のエラーチェック
+    """
     fake_path = Path("nonexistent.wav")
     with pytest.raises(FileNotFoundError):
         extract_pitch(fake_path, test_config)

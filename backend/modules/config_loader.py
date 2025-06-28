@@ -1,33 +1,38 @@
+# modules/config_loader.py
 """
-modules/config_loader.py
-
-YAML config loader with nested models and validation (pydantic).
-YAML設定ファイルのネストモデルとバリデーション対応ローダー。
+Config loader with global best-practice structure
+設定ローダー（グローバル標準構成）
 """
-
-import os
+from pydantic import BaseModel, Field
 import yaml
-import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ValidationError
+import logging
 
 logger = logging.getLogger(__name__)
 
 class WatcherConfig(BaseModel):
     watch_folder: str = Field(..., description="감시 폴더 / 監視フォルダ")
-    file_extension: str = Field(".wav", description="파일 확장자 / ファイル拡張子")
+    file_extension: str = Field(".wav", description="감시 확장자 / 監視拡張子")
 
 class TranscriberConfig(BaseModel):
     model_size: str = Field(..., description="Whisper 모델 크기 / Whisperモデルサイズ")
-    transcripts_dir: str = Field(..., description="결과 저장 폴더 / 出力フォルダ")
+    transcripts_dir: str = Field(..., description="텍스트 결과 폴더 / テキスト出力先")
 
 class PitchConfig(BaseModel):
-    output_dir: str = Field(..., description="피치 분석 결과 폴더 / ピッチ分析結果出力")
+    output_dir: str = Field(..., description="피치 결과 폴더 / ピッチ出力先")
+
+class FormantConfig(BaseModel):
+    output_dir: str = Field(..., description="포먼트 결과 폴더 / フォルマント出力先")
+
+class EmotionConfig(BaseModel):
+    output_dir: str = Field(..., description="감정 결과 폴더 / 感情出力先")
 
 class AppConfig(BaseModel):
     watcher: WatcherConfig
     transcriber: TranscriberConfig
     pitch: PitchConfig
+    formant: FormantConfig
+    emotion: EmotionConfig
 
 def load_config(config_path=None) -> AppConfig:
     """
@@ -48,8 +53,7 @@ def load_config(config_path=None) -> AppConfig:
 
     try:
         config = AppConfig(**config_dict)
-    except ValidationError as e:
+    except Exception as e:
         logger.error(f"Config validation error:\n{e}")
         raise
-
     return config

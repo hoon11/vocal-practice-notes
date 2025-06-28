@@ -1,9 +1,13 @@
-git+https://github.com/openai/whisper.git  
-watchdog  
-openai
-pyyaml
-pytest
-pytest-cov
-praat-parselmouth
-matplotlib
-pydantic-settings
+git+https://github.com/openai/whisper.git   # Whisper: transcription module / 音声→テキスト変換モジュール
+watchdog                                   # watcher: directory monitoring / ディレクトリ監視
+openai                                     # OpenAI API integration (if needed) / OpenAI API連携（必要に応じて）
+pyyaml                                     # config_loader: YAML config parsing / 設定ファイルYAML解析
+pytest                                     # test framework / テストフレームワーク
+pytest-cov                                 # coverage report / カバレッジ計測
+praat-parselmouth                          # pitch/formant extractor: acoustic analysis / ピッチ・フォルマント解析
+matplotlib                                 # visualization (pitch, formant, etc.) / 可視化（ピッチ・フォルマント等）
+pydantic-settings                          # config_loader: env override / 環境変数上書き設定
+opensmile>=2.4.1                           # emotion_analyzer: SER (emotion recognition) / 感情認識（SER）
+pyAudioAnalysis                            # emotion_analyzer: classic SER/ML features / 感情認識・従来ML特徴抽出
+scikit-learn                               # ML algorithms for SER etc. / SER等の機械学習アルゴリズム
+pandas                                     # feature/data handling / 特徴量・データ処理

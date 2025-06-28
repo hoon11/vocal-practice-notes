@@ -3,14 +3,15 @@
 Pitch extraction and breathiness ratio analyzer (Praat+Parselmouth) with pydantic config support.
 ピッチ抽出・無声音比率解析（Praat+Parselmouth）: pydantic設定対応・多言語注釈。
 """
-
+import matplotlib
+matplotlib.use("Agg")  # Headless 환경(화면 없는 서버)에서는 Agg가 표준
+import matplotlib.pyplot as plt
 import parselmouth
 from parselmouth.praat import call
 import numpy as np
 import json
 import logging
 from pathlib import Path
-import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
 

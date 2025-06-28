@@ -10,3 +10,7 @@ transcriber:
 
 pitch:
   output_dir: "backend/output/pitch"
+formant:
+  output_dir: "backend/output/formant"
+emotion:
+  output_dir: "backend/output/emotion"
