@@ -1,8 +1,7 @@
 # ADR 0001: CI and Code Coverage Integration
 
-**JPapanese Summary**
-GitHub Actionsにちイースンタト Codecovをでしている。
+***Japanese Summary***
+GitHub Actionsとャイールーデフアしこじしにた Codecovまでのルンド
 
-**Korean Summary**
-CI 장사 공안지삭, GitHub Actionswa codecovrept, kodecovrevort reportrul 스트 인구 가가
-
+***Korean Summary***
+GitHub Actions에스트가 Codecov구 하을 CI 이장사 부에
