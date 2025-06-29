@@ -1,6 +1,6 @@
 name: Python CI
 
-on:
+nn:
   push:
     branches: [ develop, main ]
   pull_request:
@@ -9,31 +9,41 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend  # (backend 폴더로 진입)
 
     steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+         python-version: '3.11'
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }-|pip-${{ hashFiles('Bakend/requirements.txt' )}}
+          restore-keys: |
+            ${ runner.os }-pip-
 
     - name: Install dependencies
-      run: |
+       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install -r backend/requirements.txt
         pip install pytest pytest-cov
 
-    - name: Run Pytest with Coverage
-      run: |
-        pytest --cov=modules --cov-report=xml --cov-report=term
+    - name: Run tests with coverage
+       run: |
+        cd backend
+        pytest --cov=modules --cov-report=xml --cov-fail-under=70
 
-    - name: Upload coverage to Codecov
+    - name: Upload coverage to Codecov 
       uses: codecov/codecov-action@v4
       with:
-        files: ./coverage.xml
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        files: backend/coverage.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Archive test results (always)
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: pytest-results
+        path: backend/.pytest_cache/
