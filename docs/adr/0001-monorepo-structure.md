@@ -6,6 +6,6 @@ The backend component is first targeted for implementation as the core vocal pro
 
 ---
 
-***Japanese Summary*生結究到物*�*
+***Japanese Summary(テリートーイド)**
 
-日本、この、な、对目要なる。。。
+日ADRでは、この、な、对目要なる。。。
