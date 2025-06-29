@@ -1,7 +1,7 @@
 # ADR 0001: CI and Code Coverage Integration
 
-***Japanese Summary***
-GitHub ActionsとCodecovでCIパイプラインとカバレッジを統合します。
+*�**Japanese Summary***
+GitHub Actions、Codecovにちイースンタト Codecovをでしている。
 
 ***Korean Summary***
-GitHub Actions와 Codecov를 활용해 CI 파이장사 경월큔 마스트 해정스
+GitHub Actions니다, Codecovʵ� 하을 CI 이장사 부에 경월큔 마스트 해정스
