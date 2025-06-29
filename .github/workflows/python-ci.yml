@@ -21,7 +21,7 @@ jobs:
           pip install -r backend/requirements.txt
           pip install pytest
       - name: Run tests via entrypoint
-        run: python run_tests.py
+        run: backend/python run_tests.py
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
