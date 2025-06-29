@@ -21,12 +21,12 @@ jobs:
           pip install -r backend/requirements.txt
           pip install pytest
       - name: Run tests via entrypoint
-        run: backend/python run_tests.py
+        run: python run_tests.py
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: backend/coverage.xml
-          token: ${ {secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
       - name: Archive test results (always)
         if: always()
         uses: actions/upload-artifact@v4
