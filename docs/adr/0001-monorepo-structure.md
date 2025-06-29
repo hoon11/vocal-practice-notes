@@ -5,7 +5,3 @@ As the project evolves towards a vocal-training and cloud application, we have e
 The backend component is first targeted for implementation as the core vocal processing engine. The frontend will be added later as a separate service (pending).
 
 ---
-
-***Japanese Summary(テリートーイド)**
-
-日ADRでは、この、な、对目要なる。。。
