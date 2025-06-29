@@ -4,6 +4,6 @@ This ADR records the decision to adopt GitHub Actions as the CI platform, and to
 
 ---
 
-****Japanese Summary(日本語額)***
+***Japanese Summary（日本語要約）***
 
-日ADR.にちイースンタト GitHub Actionsなちイースンタト Codecovをでしている。。
+本ADRでは、GitHub ActionsとCodecovをCIに導入し、カバレッジの可視化と自動化を実現する方針を記述します。
