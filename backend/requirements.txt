@@ -11,3 +11,4 @@ opensmile>=2.4.1                           # emotion_analyzer: SER (emotion reco
 pyAudioAnalysis                            # emotion_analyzer: classic SER/ML features / 感情認識・従来ML特徴抽出
 scikit-learn                               # ML algorithms for SER etc. / SER等の機械学習アルゴリズム
 pandas                                     # feature/data handling / 特徴量・データ処理
+pytest-cov
