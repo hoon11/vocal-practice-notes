@@ -21,7 +21,7 @@ backend/
 
 - `audio/` 폴더에 새로운 `.wav` 파일이 생기면 자동 감지
 - Whisper로 텍스트 변환
-- 겠과를 `transcripts/`에 `.json`으로 저잕
+- 결과를 `transcripts/`에 `.json`으로 저장
 - 추후 GPT 피드백, 슬픔 감정선 분석 등 확장 가능
 
 ## ✅ 향후 계획
