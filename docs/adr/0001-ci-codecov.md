@@ -1,7 +1,9 @@
 # ADR 0001: CI and Code Coverage Integration
 
-*�**Japanese Summary***
-GitHub Actions、Codecovにちイースンタト Codecovをでしている。
+This ADR records the decision to adopt GitHub Actions as the CI platform, and to integrate Codecov for code coverage reporting.
 
-***Korean Summary***
-GitHub Actions니다, Codecovʵ� 하을 CI 이장사 부에 경월큔 마스트 해정스
+---
+
+****Japanese Summary(日本語額)***
+
+日ADR.にちイースンタト GitHub Actionsなちイースンタト Codecovをでしている。。
