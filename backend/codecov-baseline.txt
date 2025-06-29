@@ -1,0 +1,1 @@
+Baseline commit to support coverage badge visibility in Codecov.
