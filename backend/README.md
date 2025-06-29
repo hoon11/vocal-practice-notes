@@ -1,3 +1,5 @@
+[Codecov Coverage](https://codecov.io/gh/hoon11/vocal-practice-notes/branch/develop/graph/badge.svg)
+
 # Whisper Worker - Backend Module (vocal-practice-notes)
 
 ## 📁 디렉토리 구조
