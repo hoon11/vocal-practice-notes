@@ -1,3 +1,5 @@
+[Codecov Coverage](https://codecov.io/gh/hoon11/vocal-practice-notes/branch/develop/graph/badge.svg)
+
 # Whisper Worker - Backend Module (vocal-practice-notes)
 
 ## 📁 디렉토리 구조
@@ -19,7 +21,7 @@ backend/
 
 - `audio/` 폴더에 새로운 `.wav` 파일이 생기면 자동 감지
 - Whisper로 텍스트 변환
-- 결과를 `transcripts/`에 `.json`으로 저장
+- 겠과를 `transcripts/`에 `.json`으로 저잕
 - 추후 GPT 피드백, 슬픔 감정선 분석 등 확장 가능
 
 ## ✅ 향후 계획
