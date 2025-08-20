@@ -70,7 +70,7 @@ Pitch 분석을 통해 정확한 음정을 확인하고, 곡별 연습 메모를
 
 - [x] プロジェクト初期構成 / Initial project setup / 프로젝트 초기 구조 세팅
 - [x] 録音機能実装 / Recording feature implemented / 녹음 기능 구현
-- [ ] ピッチ分析実装中 / Pitch analysis in progress / Pitch 분석 기능 구현 중
+- [x] ピッチ分析実装中 / Pitch analysis in progress / Pitch 분석 기능 구현 중
 - [ ] ピッチグラフ表示 / Pitch graph visualization / Pitch 그래프 표시
 - [ ] 曲ごとのメモ機能 / Song-specific notes / 곡별 메모 기능
 - [ ] 楽譜比較機能 / Score comparison / 악보 비교 기능
